@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Form</title>
+    
+    <link rel="stylesheet" href="form.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Feedback Form</h2>
+        
+        <form id="feedbackForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+
+            <label for="email">Email Id:</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+
+            <label for="division">Division:</label>
+            <select id="division" required>
+                <option value="" disabled selected>Select your division</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+            </select>
+
+            <label for="comment">Comment:</label>
+            <textarea id="comment" rows="4" placeholder="Write your comments here." required></textarea>
+
+            <button type="button" id="submitBtn">Submit</button>
+        </form>
+
+        
+        <div id="output"></div>
+    </div>
+
+    
+    <script src="form.js"></script>
+</body>
+</html>
