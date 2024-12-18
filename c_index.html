@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .converter {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 400px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #0056b3;
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    label {
+      display: block;
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="converter">
+    <h1>Dynamic Converter</h1>
+    <select id="conversionType">
+      <option value="temperature">Temperature</option>
+      <option value="mass">Mass</option>
+      <option value="height">Height</option>
+    </select>
+
+    <div id="conversionOptions"></div>
+
+    <input type="number" id="inputValue" placeholder="Enter value">
+
+    <button id="convertBtn">Convert</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const conversionType = document.getElementById('conversionType');
+    const conversionOptions = document.getElementById('conversionOptions');
+    const convertBtn = document.getElementById('convertBtn');
+    const inputValue = document.getElementById('inputValue');
+    const result = document.getElementById('result');
+
+    const updateOptions = () => {
+      const type = conversionType.value;
+      let optionsHTML = '';
+
+      switch (type) {
+        case 'temperature':
+          optionsHTML += `
+            <label><input type="radio" name="conversionOption" value="CtoF"> Celsius to Fahrenheit</label>
+            <label><input type="radio" name="conversionOption" value="FtoC"> Fahrenheit to Celsius</label>
+          `;
+          break;
+
+        case 'mass':
+          optionsHTML += `
+            <label><input type="radio" name="conversionOption" value="lbToKg"> Pounds to Kilograms</label>
+            <label><input type="radio" name="conversionOption" value="kgToLb"> Kilograms to Pounds</label>
+          `;
+          break;
+
+        case 'height':
+          optionsHTML += `
+            <label><input type="radio" name="conversionOption" value="mToFt"> Meters to Feet</label>
+            <label><input type="radio" name="conversionOption" value="ftToM"> Feet to Meters</label>
+          `;
+          break;
+
+        default:
+          optionsHTML = 'Select a valid conversion type.';
+      }
+
+      conversionOptions.innerHTML = optionsHTML;
+    };
+
+    const calculateConversion = (type, value, option) => {
+      switch (type) {
+        case 'temperature':
+          if (option === 'CtoF') return (value * 9) / 5 + 32;
+          if (option === 'FtoC') return ((value - 32) * 5) / 9;
+          break;
+
+        case 'mass':
+          if (option === 'lbToKg') return value * 0.453592;
+          if (option === 'kgToLb') return value / 0.453592;
+          break;
+
+        case 'height':
+          if (option === 'mToFt') return value * 3.28084;
+          if (option === 'ftToM') return value / 3.28084;
+          break;
+
+        default:
+          return null;
+      }
+    };
+
+    convertBtn.addEventListener('click', () => {
+      const selectedOption = document.querySelector('input[name="conversionOption"]:checked');
+      if (!selectedOption) {
+        result.textContent = 'Please select a conversion option.';
+        return;
+      }
+
+      const value = parseFloat(inputValue.value);
+      if (isNaN(value)) {
+        result.textContent = 'Please enter a valid number.';
+        return;
+      }
+
+      const convertedValue = calculateConversion(conversionType.value, value, selectedOption.value);
+      result.textContent = `Converted Value: ${convertedValue.toFixed(2)}`;
+    });
+
+    
+    updateOptions();
+    conversionType.addEventListener('change', updateOptions);
+  </script>
+</body>
+</html>
