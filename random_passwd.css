@@ -1,0 +1,32 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+}
+
+.container {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ab9494;
+    border-radius: 10px;
+}
+
+input[type="checkbox"] {
+    margin-right: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: rgb(10, 11, 11);
+}
+
+#password {
+    margin-top: 20px;
+    padding: 10px;
+    width: 80%;
+    border: 1px solid #bb9494;
+    border-radius: 5px;
+}

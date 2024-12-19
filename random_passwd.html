@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <link rel="stylesheet" href="random_passwd.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Password Generator</h2>
+        <div>
+            <label><input type="checkbox" id="uppercase"> Uppercase</label>
+            <br>
+            <label><input type="checkbox" id="lowercase"> Lowercase</label>
+            <br>
+
+            <label><input type="checkbox" id="digits"> Digits</label>
+            <br>
+            <label><input type="checkbox" id="special"> Special Characters</label>
+        </div>
+        <button onclick="generatePassword()">Generate Password</button>
+        <br><br>
+        <input type="text" id="password" readonly>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        <p id="message"></p>
+    </div>
+
+    <script src="random_passwd.js"></script>
+</body>
+</html>

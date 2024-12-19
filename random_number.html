@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Guessing Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .win {
+            color: green;
+        }
+
+        .lose {
+            color: red;
+        }
+
+        .error {
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Random Number Guessing Game</h1>
+        <div class="input-container">
+            <input type="number" id="userGuess" placeholder="Enter your guess" min="1" max="100">
+        </div>
+        <button onclick="checkGuess()">Guess</button>
+        <div class="message" id="message"></div>
+        <button onclick="resetGame()">Reset Game</button>
+    </div>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const userGuess = document.getElementById('userGuess').value;
+            const message = document.getElementById('message');
+
+            
+            if (userGuess === '' || isNaN(userGuess)) {
+                message.textContent = 'Please enter a valid number.';
+                message.className = 'message error';
+                return;
+            }
+
+            attempts++;
+
+            if (userGuess < randomNumber) {
+                message.textContent = `Too low! Try again.`;
+                message.className = 'message';
+            } else if (userGuess > randomNumber) {
+                message.textContent = `Too high! Try again.`;
+                message.className = 'message';
+            } else {
+                message.textContent = `Congratulations! You guessed it in ${attempts} attempts.`;
+                message.className = 'message win';
+            }
+        }
+
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('userGuess').value = '';
+            document.getElementById('message').textContent = '';
+        }
+    </script>
+
+</body>
+</html>
