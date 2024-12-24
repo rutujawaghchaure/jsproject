@@ -16,7 +16,7 @@ async function initializeModel() {
     try {
         classifier = await ml5.imageClassifier('https://teachablemachine.withgoogle.com/models/5v1zO_Xmu/', () => {
             isModelLoaded = true;
-            modelStatus.textContent = 'MobileNet model loaded successfully!';
+            modelStatus.textContent = 'Rutuja  model loaded successfully!';
             modelStatus.style.backgroundColor = '#d4edda';
             modelStatus.style.color = '#155724';
         });
