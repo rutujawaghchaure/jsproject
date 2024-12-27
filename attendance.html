@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <link rel="stylesheet" href="attendance.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Attendance System</h1>
+        
+        <div class="camera-section">
+            <div class="webcam-container">
+                <video id="webcam" autoplay playsinline></video>
+            </div>
+            
+            <div class="status-box">
+                <div id="status">Initializing...</div>
+                <div id="confidence"></div>
+            </div>
+        </div>
+
+        <div class="attendance-records">
+            <h2>Today's Attendance</h2>
+            <div class="record-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-log">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="attendance.js"></script>
+</body>
+</html>

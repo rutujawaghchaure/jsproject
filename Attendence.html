@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+        }
+
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Title Styles */
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2980b9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        /* Webcam Section */
+        .webcam-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #webcam {
+            width: 100%;
+            max-width: 650px;
+            border-radius: 12px;
+            border: 5px solid #2980b9;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Status Box */
+        .status-box {
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status {
+            font-size: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            background-color: #ecf0f1;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #34495e;
+        }
+
+        /* Attendance Table */
+        .attendance-records {
+            margin-top: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        td {
+            background-color: #f9fafb;
+        }
+
+        .present-entry {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .absent-entry {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Hover Effect for Attendance Table */
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 30px;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            #webcam {
+                max-width: 100%;
+                height: auto;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+
+            .status {
+                font-size: 18px;
+                padding: 10px 15px;
+            }
+        }
+
+        /* Animation for Status */
+        .status.present {
+            background-color: #2ecc71;
+            color: white;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .status.absent {
+            background-color: #e74c3c;
+            color: white;
+            animation: shake 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Attendance System</h1>
+
+        <div class="camera-section">
+            <div class="webcam-container">
+                <video id="webcam" autoplay playsinline></video>
+            </div>
+
+            <div class="status-box">
+                <div id="status" class="status">Initializing...</div>
+            </div>
+        </div>
+
+        <div class="attendance-records">
+            <h2>Today's Attendance</h2>
+            <div class="record-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-log">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MODEL_URL = 'https://teachablemachine.withgoogle.com/models/6CvZoYjIO/';
+        let model, webcam, maxPredictions;
+        let lastRecordTime = 0;
+        const RECORD_INTERVAL = 5000;
+
+        async function init() {
+            const modelURL = MODEL_URL + "model.json";
+            const metadataURL = MODEL_URL + "metadata.json";
+
+            try {
+                // Load the model
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+
+                // Setup webcam
+                const flip = true;
+                webcam = new tmImage.Webcam(640, 480, flip);
+                await webcam.setup();
+                await webcam.play();
+
+                // Connect webcam to video element
+                document.getElementById("webcam").srcObject = webcam.webcam.srcObject;
+
+                // Start the prediction loop
+                window.requestAnimationFrame(loop);
+
+                // Update status
+                document.getElementById("status").textContent = "System Ready";
+            } catch (error) {
+                document.getElementById("status").textContent = "Error: Please check camera permissions";
+                console.error(error);
+            }
+        }
+
+        async function loop() {
+            webcam.update();
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        async function predict() {
+            const prediction = await model.predict(webcam.canvas);
+            const statusDiv = document.getElementById("status");
+
+            // Sort predictions to get the highest probability class
+            const highestPrediction = prediction.sort((a, b) => b.probability - a.probability)[0];
+
+            // Get the class label with the highest probability
+            const predictedClass = highestPrediction.className;
+            const probability = highestPrediction.probability;
+
+            // Only display "present" if the class with the highest probability exceeds 80%
+            if (probability > 0.8) {
+                statusDiv.innerHTML = <span class="present">vishang is present</span>;
+                statusDiv.classList.add('present');
+                statusDiv.classList.remove('absent');
+            } else {
+                statusDiv.innerHTML = "<span class='absent'>vishang is absent</span>";
+                statusDiv.classList.add('absent');
+                statusDiv.classList.remove('present');
+            }
+
+            // Record attendance periodically
+            const currentTime = Date.now();
+            if (currentTime - lastRecordTime >= RECORD_INTERVAL) {
+                recordAttendance(predictedClass, probability);
+                lastRecordTime = currentTime;
+            }
+        }
+
+        function recordAttendance(predictedClass, probability) {
+            const table = document.getElementById("attendance-log");
+            const row = document.createElement("tr");
+            const currentTime = new Date().toLocaleTimeString();
+
+            row.innerHTML = ` 
+                <td>${currentTime}</td>
+                <td><span class="${probability > 0.9 ? 'present-entry' : 'absent-entry'}">vishang is ${probability > 0.9 ? 'Present' : 'Absent'}</span></td>
+            `;
+
+            // Add new record at the top of the table
+            if (table.firstChild) {
+                table.insertBefore(row, table.firstChild);
+            } else {
+                table.appendChild(row);
+            }
+
+            // Keep only the last 50 records
+            while (table.children.length > 50) {
+                table.removeChild(table.lastChild);
+            }
+        }
+
+        // Initialize the system when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
